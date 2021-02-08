@@ -15,6 +15,7 @@ git clone https://github.com/bsw112/anime_worldcup.git
 
 # 비주얼 스튜디오로 빌드합니다. 개발환경은 비주얼스튜디오 2016 버전입니다.
 
+솔루션 탐색기 > client > 프로젝트 속성 > VC++디렉터리 > 포함디렉터리에 $(ProjectDir)../Headers 경로를 추가합니다.
 솔루션 탐색기 > client > 프로젝트 속성 > HLSL 컴파일러 > 셰이더형식을 효과(/fx) 로 맞춰줍니다.
 솔루션 탐색기 > client > 프로젝트 속성 > HLSL 컴파일러 > 셰이더모델을 Shader Model2(/2.0) 으로 맞춰줍니다.
 솔루션 탐색기 > client > 프로젝트 속성 > 링커 > 입력 > 추가 종속성에서 d3d9.lib, d3dx9.lib 를 추가해줍니다. 
