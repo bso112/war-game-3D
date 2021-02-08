@@ -1,0 +1,120 @@
+추가된 것들
+UI, Button, Image, VIBuffer_ViewPort, 키매니저. Image3D, 콜리전매니저, 
+콜라이더, box콜라이더, 렉트콜라이더, 일립스콜라이더,
+
+오브젝트매니저
+Add_Object_ToLayer // 추가한 오브젝트 반환하게 수정함
+Clear_DeadObject //렌더한 다음에 오브젝트 삭제하려고
+
+게임오브젝트
+OnCollision콜백
+Clear_DeadObject 
+
+씬매니저
+Get_CurrScene
+
+
+***** 알아야할것
+
+@ 키매니저
+
+기존의 키매니저는 A와 B가 동시에 VK_LBUTTON을 KeyDown으로 입력받을때
+A는 입력을 받을 수 있지만 B는 받을 수 없는 문제가 존재.
+
+따라서 옵저버 패턴을 이용해 해결했음.
+사용하려면
+
+1. MainApp의 Update에서 KeyMgr의 KeyDown, KeyUp, KeyPressing 등을 부름
+
+CKeyMgr::Get_Instance()->Key_Down(VK_LBUTTON);
+CKeyMgr::Get_Instance()->Key_Up(VK_LBUTTON);
+
+CKeyMgr::Get_Instance()->Key_Down(VK_RBUTTON);
+CKeyMgr::Get_Instance()->Key_Up(VK_RBUTTON);
+
+주의할 점은 사용하고 싶은 모든 경우의 수를 일일히 불러줘야함.
+
+예를들어 KeyDown(VK_LBUTTON)을 사용하고 싶다면
+CKeyMgr::Get_Instance()->Key_Down(VK_LBUTTON); 을 부르고
+
+KeyDown(VK_RBUTTON)을 사용하고 싶다면
+CKeyMgr::Get_Instance()->Key_Down(VK_RBUTTON); 을 추가로 부름.
+
+또, Key_Up(VK_LBUTTON)을 사용하고 싶다면
+CKeyMgr::Get_Instance()->Key_Down(VK_LBUTTON); 을 추가로 부름.
+
+우리는 원래 입력을 받고싶은 객체 안에서 이짓을 했지만 여기서는 MainApp의 Update로 
+몰아 넣은 것으로 보면 됨.
+그럼 KeyDown 했을때 객체가 수행할 로직은 어디서 불릴까.
+
+
+2. CBase에 있는 OnKeyDown, OnKeyPressing, OnKeyUp등을 입력받고 싶은 객체에서 구현함.
+
+
+HRESULT CMyButton::OnKeyDown(_int KeyCode)
+{
+	if(KeyCode == VK_LEFT)
+	{ int a = 3;}
+	return S_OK;
+}
+
+이러면 마우스가 눌렸을때 OnKeyDown이 호출됨.
+(정확히 말하자면 어떤 버튼을 누르든 OnKeyDown이 호출됨. 그래서 안에서 if(KeyCode == VK_LEFT) 로 조건문 건것임.
+
+@ 콜리전 매니저
+
+수업때 다룬 Renderer를 따라해서 구현함.
+현재 BOX의 충돌만 구현함.
+충돌처리를 위해서는 렌더러 쓰듯이 
+CCollisionMgr::Add_CollisionGroup(COL_BOX, this); 이걸 LateUpdate에서 부르면 됨
+
+콜라이더의 태그는 항상 Com_Collider 이여야됨
+(등록된 게임오브젝트의 콜라이더를 가져올때 Find_Component(L"Com_Collider"); 이런식으로 가져오기 때문임.
+
+이후 GameObject에 있는 OnCollisionEnter 등을 상속받아 구현하면 됨.
+OnCollisionEnter : 충돌 시작할때 한번 불림
+OnCollisionStay : 충돌동안 계속 불림
+OnCollisionExit : 충돌 끝날때 한번 불림
+
+
+
+
+********** 몰라도 되지만 알면 좋은것
+
+구조체
+
+BASEDESC 는 위치, 크기정보를 가지고 있음.
+클론할때 void*로 위치, 크기 정보를 던지고 싶을때 유용함.
+BASEDESC(_float3(45, g_iWinSizeY - 160.f, 0.f), _float3(50.f, 50.f, 1.f));
+이렇게 생성자를 이용해 사용함.
+
+UI 
+
+@ MyButton  
+Funtion이라는 함수를 담을 수 있는 자료형을 이용했음.
+기본적으로 버튼이라는 객체에 눌렸을때 실행할 함수를 넘겨주는 식으로 사용함.
+ex) m_pButton->Add_Listener([]{ int a = 0;}) //버튼이 눌렸을때 int a = 0을 수행한다.
+인자로 넘기는 함수는 반환값이 void고 인자가 없는 람다식, 전역함수만이 가능함.
+
+* AddListener는 버튼이 눌렸을때 여러 함수를 실행하기 위한 함수임.
+  SetListener는 버튼이 눌렸을때 하나의 함수를 실행하기 위한 함수임.
+
+예를 들어 AddLisnter(A), AddListner(B)를 하면 버튼눌렸을때 A,B 가 동시에 수행됨
+SetListner(A) 하고 SetListenr(B) 하면 덮어씌워져서 B만 수행됨.
+
+@ MyImage
+그저 텍스쳐를 입힌 이미지를 띄우기 위한 객체임.
+	CMyImage::STATEDESC gameImgDesc;
+	gameImgDesc.m_iTextureSceneID = SCENE_STATIC; 
+	gameImgDesc.m_pTextureTag = L"Component_Texture_Gold"; //이미지에 입힐 텍스쳐 태그
+	gameImgDesc.m_tBaseDesc = BASEDESC(_float3(45, g_iWinSizeY - 160.f, 0.f), _float3(50.f, 50.f, 1.f));
+	if (FAILED((CMyImage*)pManagement->Add_Object_ToLayer(SCENE_STATIC, L"GameObject_MyImage", SCENE_STAGE1, L"Layer_UI", &gameImgDesc)))
+		return E_FAIL;
+
+이런식으로 사용함.
+
+@ VIBuffer_ViewPort
+
+D2D때 사용한 VIBuffer랑 똑같음. 주의할점은 VIBuffer의 하위클래스가 아님.
+왜냐하면 정점의 위치를  VIBuffer처럼 _float3 가 아닌 _float4를 써서 따로 빼놨음.
+
