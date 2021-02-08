@@ -40,4 +40,4 @@ git clone https://github.com/bsw112/anime_worldcup.git
 ![alt](readme/슬라이드44.PNG)
 
 ## 시연
-![시연](http://img.youtube.com/vi/TCkKDWs3Jg/0.jpg)](https://www.youtube.com/watch?v=-TCkKDWs3Jg)
+[![시연](http://img.youtube.com/vi/-TCkKDWs3Jg/0.jpg)](https://www.youtube.com/watch?v=-TCkKDWs3Jg)
