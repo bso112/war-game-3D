@@ -13,6 +13,8 @@ git clone https://github.com/bsw112/war-game-3D.git
 
 # DirectX9을 설치합니다.
 
+# FrameWork.sln 파일로 프로젝트를 엽니다.
+
 # 비주얼 스튜디오로 빌드합니다. 개발환경은 비주얼스튜디오 2016 버전입니다.
 
 솔루션 탐색기 > client > 프로젝트 속성 > VC++디렉터리 > 포함디렉터리에 $(ProjectDir)../Headers 경로를 추가합니다.
