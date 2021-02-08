@@ -9,7 +9,7 @@ C++, DirectX9, MFC, WIN32API
 ## 실행법
 ```
 # 깃 허브에서 소스코드를 다운로드 받습니다.
-git clone https://github.com/bsw112/anime_worldcup.git
+git clone https://github.com/bsw112/war-game-3D.git
 
 # DirectX9을 설치합니다.
 
